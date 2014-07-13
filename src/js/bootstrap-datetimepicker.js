@@ -760,7 +760,7 @@ THE SOFTWARE.
                 picker.element.on({
                     'focus': $.proxy(picker.show, this),
                     'change': $.proxy(change, this),
-                    'blur': $.proxy(picker.hide, this)
+                    'blur': $.proxy(picker.blur, this)
                 });
             } else {
                 picker.element.on({
@@ -1095,7 +1095,7 @@ THE SOFTWARE.
             attachDatePickerEvents();
         },
 
-        picker.hide = function (event) {
+        picker.hide = function (event, dontBlurPicker) {
             if (event && $(event.target).is(picker.element.attr("id")))
                 return;
             // Ignore event if in the middle of a picker transition
@@ -1109,11 +1109,28 @@ THE SOFTWARE.
             picker.widget.removeClass("picker-open");
             picker.viewMode = picker.startViewMode;
             showMode();
+            
+            if (dontBlurPicker !== true) {
+                // blur picker.element
+                picker.element.trigger({
+                    type: 'blur',
+                    dontHidePicker: true // prevent recursion
+                });
+            }
+            
             picker.element.trigger({
                 type: 'dp.hide',
                 date: pMoment(picker.date)
             });
             detachDatePickerGlobalEvents();
+        },
+        
+        picker.blur = function (event) {
+            if (event.dontHidePicker === true) {
+                // prevent recursion
+                return;
+            }
+            picker.hide(false, true);
         },
 
         picker.setValue = function (newDate) {
