@@ -161,6 +161,7 @@ THE SOFTWARE.
 
             picker.options.disabledDates = indexGivenDates(picker.options.disabledDates);
             picker.options.enabledDates = indexGivenDates(picker.options.enabledDates);
+            picker.options.highlightedDates = indexGivenDates(picker.options.highlightedDates);
 
             picker.startViewMode = picker.viewMode;
             picker.setMinDate(picker.options.minDate);
@@ -390,6 +391,9 @@ THE SOFTWARE.
                 }
                 if (isInDisableDates(prevMonth, 'day') || !isInEnableDates(prevMonth)) {
                     clsName += ' disabled';
+                }
+                if (isInHighlightedDates(prevMonth)) {
+                    clsName += ' highlighted';
                 }
                 if (picker.options.showToday === true) {
                     if (prevMonth.isSame(pMoment(), 'day')) {
@@ -887,6 +891,13 @@ THE SOFTWARE.
             }
             return picker.options.enabledDates[pMoment(date).format("YYYY-MM-DD")] === true;
         },
+        isInHighlightedDates = function (date) {
+            pMoment.lang(picker.options.language);
+            if (picker.options.highlightedDates === false) {
+                return false;
+            }
+            return picker.options.highlightedDates[pMoment(date).format("YYYY-MM-DD")] === true;
+        },
 
         indexGivenDates = function (givenDatesArray) {
             // Store given enabledDates and disabledDates as keys.
@@ -1177,6 +1188,10 @@ THE SOFTWARE.
             picker.options.enabledDates = indexGivenDates(dates);
             if (picker.viewDate) update();
         },
+        picker.setHighlightedDates = function (dates) {
+            picker.options.highlightedDates = indexGivenDates(dates);
+            if (picker.viewDate) update();
+        },
 
         picker.setMaxDate = function (date) {
             if (date == undefined) return;
@@ -1215,6 +1230,7 @@ THE SOFTWARE.
         defaultDate: "",
         disabledDates: false,
         enabledDates: false,
+        highlightedDates: false,
         icons: {},
         useStrict: false,
         direction: "auto",
