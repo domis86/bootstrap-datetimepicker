@@ -162,6 +162,7 @@ THE SOFTWARE.
             picker.options.disabledDates = indexGivenDates(picker.options.disabledDates);
             picker.options.enabledDates = indexGivenDates(picker.options.enabledDates);
             picker.options.highlightedDates = indexGivenDates(picker.options.highlightedDates);
+            picker.options.datesTips = indexGivenTips(picker.options.datesTips);
 
             picker.startViewMode = picker.viewMode;
             picker.setMinDate(picker.options.minDate);
@@ -408,7 +409,12 @@ THE SOFTWARE.
                         }
                     }
                 }
-                row.append('<td class="day' + clsName + '">' + prevMonth.date() + '</td>');
+
+                var tip = getTipForDate(prevMonth);
+                var tdTitle = (tip===false) ? '' : (' title="' + tip + '"');
+
+                // row.append('<td class="day' + clsName + '">' + prevMonth.date() + '</td>');
+                row.append('<td class="day' + clsName + '" ' + tdTitle + '>' + prevMonth.date() + '</td>');
 
                 currentDate = prevMonth.date();
                 prevMonth.add(1, "d");
@@ -418,6 +424,14 @@ THE SOFTWARE.
                 }
             }
             picker.widget.find('.datepicker-days tbody').empty().append(html);
+
+            if (typeof jQuery.qtip !== 'undefined') {
+                // apply datesTips to calendar table days
+                picker.widget.find('.datepicker-days table tbody tr td.day.highlighted[title]').qtip({
+                    style: 'higher-zindex'
+                });
+            }
+
             currentYear = picker.date.year(), months = picker.widget.find('.datepicker-months')
 				.find('th:eq(1)').text(year).end().find('span').removeClass('active');
             if (currentYear === year) {
@@ -917,6 +931,35 @@ THE SOFTWARE.
             return false;
         },
 
+        indexGivenTips = function(givenDatesTipsArray) {
+            var givenDatesIndexed = {};
+            var givenDatesCount = 0;
+            for (i = 0; i < givenDatesTipsArray.length; i++) {
+                dDate = givenDatesTipsArray[i][0];
+                dDate = pMoment(dDate);
+                if (dDate.isValid()) {
+                    givenDatesIndexed[dDate.format("YYYY-MM-DD")] = givenDatesTipsArray[i][1];
+                    givenDatesCount++;
+                }
+            }
+            if (givenDatesCount > 0) {
+                return givenDatesIndexed;
+            }
+            return false;
+        },
+
+        getTipForDate = function (date) {
+            pMoment.lang(picker.options.language);
+            if (picker.options.datesTips === false) {
+                return false;
+            }
+            var tip = picker.options.datesTips[pMoment(date).format("YYYY-MM-DD")];
+            if (typeof tip == 'undefined') {
+                return false;
+            }
+            return tip;
+        },
+
         padLeft = function (string) {
             string = string.toString();
             if (string.length >= 2) return string;
@@ -1231,6 +1274,7 @@ THE SOFTWARE.
         disabledDates: false,
         enabledDates: false,
         highlightedDates: false,
+        datesTips: false,
         icons: {},
         useStrict: false,
         direction: "auto",
