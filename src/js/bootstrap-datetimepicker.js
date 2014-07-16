@@ -163,6 +163,8 @@ THE SOFTWARE.
             picker.options.enabledDates = indexGivenDates(picker.options.enabledDates);
             picker.options.highlightedDates = indexGivenDates(picker.options.highlightedDates);
             picker.options.datesTips = indexGivenTips(picker.options.datesTips);
+            picker.options.datesLanguages = indexGivenLanguages(picker.options.datesLanguages);
+            picker.options.selectedDatesLanguage = 'all';
 
             picker.startViewMode = picker.viewMode;
             picker.setMinDate(picker.options.minDate);
@@ -396,6 +398,10 @@ THE SOFTWARE.
                 if (isInHighlightedDates(prevMonth)) {
                     clsName += ' highlighted';
                 }
+                if ('all' != picker.options.selectedDatesLanguage && !dateHasLanguage(prevMonth, picker.options.selectedDatesLanguage)) {
+                    clsName = clsName.replace('highlighted', ''); // dont highlight days when they are filtered out
+                    clsName += ' disabled';
+                }
                 if (picker.options.showToday === true) {
                     if (prevMonth.isSame(pMoment(), 'day')) {
                         clsName += ' today';
@@ -431,6 +437,7 @@ THE SOFTWARE.
                     style: 'higher-zindex'
                 });
             }
+            drawLanguagesFilter();
 
             currentYear = picker.date.year(), months = picker.widget.find('.datepicker-months')
 				.find('th:eq(1)').text(year).end().find('span').removeClass('active');
@@ -754,6 +761,16 @@ THE SOFTWARE.
             var $this, $parent, expanded, closed, collapseData;
             picker.widget.on('click', '.datepicker *', $.proxy(click, this)); // this handles date picker clicks
             picker.widget.on('click', '[data-action]', $.proxy(doAction, this)); // this handles time picker clicks
+
+            picker.widget.off('.datepicker-language-filter *');
+            picker.widget.on('change', '.datepicker-language-filter .select-container select', $.proxy(function(e) {
+                picker.options.selectedDatesLanguage = $(e.target).val();
+                fillDate();
+            }, this));
+            picker.widget.on('mousedown', '.datepicker-language-filter *', $.proxy(function(e) {
+                e.stopPropagation();
+            }, this));
+
             picker.widget.on('mousedown', $.proxy(stopEvent, this));
             picker.element.on('keydown', $.proxy(keydown, this));
             if (picker.options.pickDate && picker.options.pickTime) {
@@ -823,6 +840,8 @@ THE SOFTWARE.
                     picker.element.off('click', picker.show);
                 }
             }
+
+            picker.widget.off('.datepicker-language-filter *');
         },
 
         detachDatePickerGlobalEvents = function () {
@@ -958,6 +977,68 @@ THE SOFTWARE.
                 return false;
             }
             return tip;
+        },
+
+        indexGivenLanguages = function(givenDatesLanguagesArray) {
+            var givenDatesIndexed = {}, givenDatesCount = 0, i;
+            var uniqueLanguagesIndex = {};
+            var uniqueLanguagesArray = [];
+            for (i = 0; i < givenDatesLanguagesArray.length; i++) {
+                dDate = givenDatesLanguagesArray[i][0];
+                dDate = pMoment(dDate);
+                if (dDate.isValid()) {
+                    var oDateFormatted = dDate.format("YYYY-MM-DD");
+                    var countDatesLanguages = givenDatesLanguagesArray[i][1].length;
+                    if (countDatesLanguages > 0) {
+                        givenDatesIndexed[oDateFormatted] = {};
+                        var language;
+                        for (var j = 0; j < countDatesLanguages; j++) {
+                            language = givenDatesLanguagesArray[i][1][j];
+                            givenDatesIndexed[oDateFormatted][language] = true;
+                            if (uniqueLanguagesIndex[language] !== true) {
+                                uniqueLanguagesIndex[language] = true;
+                                uniqueLanguagesArray.push(language);
+                            }
+                        }
+                        givenDatesCount++;
+                    }
+                }
+            }
+            if (givenDatesCount > 0) {
+                picker.options.datesLanguagesUnique = uniqueLanguagesArray;
+                return givenDatesIndexed;
+            }
+            picker.options.datesLanguagesUnique = false;
+            return false;
+        },
+        dateHasLanguage = function (date, language) {
+            if (!pickerHasLanguages()) {
+                return false;
+            }
+            var languages = picker.options.datesLanguages[pMoment(date).format("YYYY-MM-DD")];
+            return (typeof languages != 'undefined') && (languages[language] === true);
+        },
+        pickerHasLanguages = function () {
+            return picker.options.datesLanguages !== false;
+        },
+        drawLanguagesFilter = function () {
+            if (!pickerHasLanguages() || picker.widget.find('.datepicker-language-filter').length > 0) {
+                return;
+            }
+            var languagesDiv = $('<div class="datepicker-language-filter">');
+            languagesDiv.append('<div class="col-xs-6">Show languages:</span>');
+            languagesDiv.append('<div class="col-xs-6 select-container"></span>');
+
+            var languageSelected = picker.options.selectedDatesLanguage;
+            var selectHtml = '<select class="">';
+            selectHtml += '<option value="all" ' + (languageSelected == 'all' ? ' selected="selected"' : '') + '>All</option>';
+            for (i = 0; i < picker.options.datesLanguagesUnique.length; i++) {
+                var language = picker.options.datesLanguagesUnique[i];
+                selectHtml += '<option value="' + language + '" ' + (languageSelected == language ? ' selected="selected"' : '') + '>' + language + '</option>';
+            }
+            selectHtml += '</select>';
+            languagesDiv.find('.select-container').append(selectHtml);
+            picker.widget.append(languagesDiv);
         },
 
         padLeft = function (string) {
@@ -1275,6 +1356,7 @@ THE SOFTWARE.
         enabledDates: false,
         highlightedDates: false,
         datesTips: false,
+        datesLanguages: false,
         icons: {},
         useStrict: false,
         direction: "auto",
