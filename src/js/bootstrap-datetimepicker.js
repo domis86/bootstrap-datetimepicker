@@ -433,11 +433,12 @@ THE SOFTWARE.
 
             if (typeof jQuery.qtip !== 'undefined') {
                 // apply datesTips to calendar table days
-                picker.widget.find('.datepicker-days table tbody tr td.day.highlighted[title]').qtip({
+                picker.widget.find('.datepicker-days table tbody tr td.day[title]').qtip({
                     style: 'higher-zindex'
                 });
             }
-            drawLanguagesFilter();
+            if (typeof picker.languageFilterExtensionDraw == 'function') picker.languageFilterExtensionDraw();
+
 
             currentYear = picker.date.year(), months = picker.widget.find('.datepicker-months')
 				.find('th:eq(1)').text(year).end().find('span').removeClass('active');
@@ -762,14 +763,7 @@ THE SOFTWARE.
             picker.widget.on('click', '.datepicker *', $.proxy(click, this)); // this handles date picker clicks
             picker.widget.on('click', '[data-action]', $.proxy(doAction, this)); // this handles time picker clicks
 
-            picker.widget.off('.datepicker-language-filter *');
-            picker.widget.on('change', '.datepicker-language-filter .select-container select', $.proxy(function(e) {
-                picker.options.selectedDatesLanguage = $(e.target).val();
-                fillDate();
-            }, this));
-            picker.widget.on('mousedown', '.datepicker-language-filter *', $.proxy(function(e) {
-                e.stopPropagation();
-            }, this));
+            if (typeof picker.languageFilterExtensionAttachEvents == 'function') picker.languageFilterExtensionAttachEvents(fillDate);
 
             picker.widget.on('mousedown', $.proxy(stopEvent, this));
             picker.element.on('keydown', $.proxy(keydown, this));
@@ -1020,25 +1014,6 @@ THE SOFTWARE.
         },
         pickerHasLanguages = function () {
             return picker.options.datesLanguages !== false;
-        },
-        drawLanguagesFilter = function () {
-            if (!pickerHasLanguages() || picker.widget.find('.datepicker-language-filter').length > 0) {
-                return;
-            }
-            var languagesDiv = $('<div class="datepicker-language-filter">');
-            languagesDiv.append('<div class="col-xs-6">Show languages:</span>');
-            languagesDiv.append('<div class="col-xs-6 select-container"></span>');
-
-            var languageSelected = picker.options.selectedDatesLanguage;
-            var selectHtml = '<select class="">';
-            selectHtml += '<option value="all" ' + (languageSelected == 'all' ? ' selected="selected"' : '') + '>All</option>';
-            for (i = 0; i < picker.options.datesLanguagesUnique.length; i++) {
-                var language = picker.options.datesLanguagesUnique[i];
-                selectHtml += '<option value="' + language + '" ' + (languageSelected == language ? ' selected="selected"' : '') + '>' + language + '</option>';
-            }
-            selectHtml += '</select>';
-            languagesDiv.find('.select-container').append(selectHtml);
-            picker.widget.append(languagesDiv);
         },
 
         padLeft = function (string) {
@@ -1332,9 +1307,15 @@ THE SOFTWARE.
         init();
     };
 
-    $.fn.datetimepicker = function (options) {
+    $.fn.datetimepicker = function (options, DateTimePickerExtension) {
         return this.each(function () {
             var $this = $(this), data = $this.data('DateTimePicker');
+            // mod by domis86 - start
+            if (!data && DateTimePickerExtension) {
+                $this.data('DateTimePicker', new DateTimePickerExtension(DateTimePicker, this, options));
+                return;
+            }
+            // mod by domis86 - end
             if (!data) $this.data('DateTimePicker', new DateTimePicker(this, options));
         });
     };
@@ -1357,6 +1338,7 @@ THE SOFTWARE.
         highlightedDates: false,
         datesTips: false,
         datesLanguages: false,
+        translations: false,
         icons: {},
         useStrict: false,
         direction: "auto",
