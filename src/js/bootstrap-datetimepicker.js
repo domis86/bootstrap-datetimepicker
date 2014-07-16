@@ -892,7 +892,6 @@ THE SOFTWARE.
             return picker.options.enabledDates[pMoment(date).format("YYYY-MM-DD")] === true;
         },
         isInHighlightedDates = function (date) {
-            pMoment.lang(picker.options.language);
             if (picker.options.highlightedDates === false) {
                 return false;
             }
