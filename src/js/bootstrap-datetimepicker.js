@@ -951,8 +951,7 @@ THE SOFTWARE.
         },
 
         indexGivenTips = function(givenDatesTipsArray) {
-            var givenDatesIndexed = {};
-            var givenDatesCount = 0;
+            var givenDatesIndexed = {}, givenDatesCount = 0, i;
             for (i = 0; i < givenDatesTipsArray.length; i++) {
                 dDate = givenDatesTipsArray[i][0];
                 dDate = pMoment(dDate);
@@ -968,7 +967,6 @@ THE SOFTWARE.
         },
 
         getTipForDate = function (date) {
-            pMoment.lang(picker.options.language);
             if (picker.options.datesTips === false) {
                 return false;
             }
