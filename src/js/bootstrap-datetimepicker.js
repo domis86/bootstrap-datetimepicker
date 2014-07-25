@@ -1301,6 +1301,9 @@ THE SOFTWARE.
             if (picker.viewDate) update();
         };
 
+        picker.update = function () {
+            update();
+        };
         init();
     };
 
