@@ -80,7 +80,11 @@ THE SOFTWARE.
 
             picker.id = dpgId++;
             pMoment.lang(picker.options.language);
-            picker.date = pMoment();
+
+            // mod by domis86 - add initialViewDate - start
+            picker.date = picker.options.initialViewDate ? pMoment(picker.options.initialViewDate) : pMoment();
+            // mod by domis86 - add initialViewDate - end
+
             picker.unset = false;
             picker.isInput = picker.element.is('input');
             picker.component = false;
@@ -228,6 +232,7 @@ THE SOFTWARE.
             if (eData.dateUsestrict !== undefined) picker.options.useStrict = eData.dateUsestrict;
             if (eData.dateDirection !== undefined) picker.options.direction = eData.dateDirection;
             if (eData.dateSidebyside !== undefined) picker.options.sideBySide = eData.dateSidebyside;
+            if (eData.initialViewDate !== undefined) picker.options.initialViewDate = eData.initialViewDate; // mod by domis86 - add initialViewDate
         },
 
         place = function () {
@@ -1343,7 +1348,9 @@ THE SOFTWARE.
         useStrict: false,
         direction: "auto",
         sideBySide: false,
-        daysOfWeekDisabled: false
+        daysOfWeekDisabled: false,
+
+        initialViewDate: false // mod by domis86 - add initialViewDate
     };
 
 }));
