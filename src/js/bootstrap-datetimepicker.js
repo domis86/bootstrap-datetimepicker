@@ -29,23 +29,29 @@ THE SOFTWARE.
 ; (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD is used - Register as an anonymous module.
-        define(['jquery', 'moment'], factory);
+        define(['jquery', 'moment','Modernizr'], factory);
     } else {
         // AMD is not used - Attempt to fetch dependencies from scope.
         if (!jQuery) {
             throw 'bootstrap-datetimepicker requires jQuery to be loaded first';
         } else if (!moment) {
             throw 'bootstrap-datetimepicker requires moment.js to be loaded first';
+        } else if (!Modernizr) {
+            throw 'bootstrap-datetimepicker requires Modernizr.js to be loaded first';
         } else {
-            factory(jQuery, moment);
+            factory(jQuery, moment,Modernizr);
         }
     }
 }
 
-(function ($, moment) {
+(function ($, moment, Modernizr) {
     if (typeof moment === 'undefined') {
         alert("momentjs is required");
         throw new Error('momentjs is required');
+    };
+    if (typeof Modernizr === 'undefined') {
+        alert("Modernizr is required");
+        throw new Error('Modernizr is required');
     };
 
     var dpgId = 0,
@@ -764,31 +770,62 @@ THE SOFTWARE.
         },
 
         attachDatePickerEvents = function () {
+
+
+
             var $this, $parent, expanded, closed, collapseData;
-            picker.widget.on('click', '.datepicker *', $.proxy(click, this)); // this handles date picker clicks
-            picker.widget.on('click', '[data-action]', $.proxy(doAction, this)); // this handles time picker clicks
+            if(Modernizr.touch) {
+                picker.widget.on('touchend','.datepicker *', $.proxy(click, this));
+                picker.widget.on('touchend', '[data-action]', $.proxy(doAction, this)); // this handles time picker clicks
+            } else {
+                picker.widget.on('click', '.datepicker *', $.proxy(click, this)); // this handles date picker clicks
+                picker.widget.on('click', '[data-action]', $.proxy(doAction, this)); // this handles time picker clicks
+            }
+
 
             if (typeof picker.languageFilterExtensionAttachEvents == 'function') picker.languageFilterExtensionAttachEvents(fillDate);
 
             picker.widget.on('mousedown', $.proxy(stopEvent, this));
             picker.element.on('keydown', $.proxy(keydown, this));
-            if (picker.options.pickDate && picker.options.pickTime) {
-                picker.widget.on('click.togglePicker', '.accordion-toggle', function (e) {
-                    e.stopPropagation();
-                    $this = $(this);
-                    $parent = $this.closest('ul');
-                    expanded = $parent.find('.in');
-                    closed = $parent.find('.collapse:not(.in)');
 
-                    if (expanded && expanded.length) {
-                        collapseData = expanded.data('collapse');
-                        if (collapseData && collapseData.transitioning) return;
-                        expanded.collapse('hide');
-                        closed.collapse('show');
-                        $this.find('span').toggleClass(picker.options.icons.time + ' ' + picker.options.icons.date);
-                        picker.element.find('.input-group-addon span').toggleClass(picker.options.icons.time + ' ' + picker.options.icons.date);
-                    }
-                });
+            if (picker.options.pickDate && picker.options.pickTime) {
+                if(Modernizr.touch) {
+                    picker.widget.on('touchEnd.togglePicker', '.accordion-toggle', function (e) {
+                        e.stopPropagation();
+                        $this = $(this);
+                        $parent = $this.closest('ul');
+                        expanded = $parent.find('.in');
+                        closed = $parent.find('.collapse:not(.in)');
+
+
+                        if (expanded && expanded.length) {
+                            collapseData = expanded.data('collapse');
+                            if (collapseData && collapseData.transitioning) return;
+                            expanded.collapse('hide');
+                            closed.collapse('show');
+                            $this.find('span').toggleClass(picker.options.icons.time + ' ' + picker.options.icons.date);
+                            picker.element.find('.input-group-addon span').toggleClass(picker.options.icons.time + ' ' + picker.options.icons.date);
+                        }
+                    });
+                } else {
+                    picker.widget.on('click.togglePicker', '.accordion-toggle', function (e) {
+                        e.stopPropagation();
+                        $this = $(this);
+                        $parent = $this.closest('ul');
+                        expanded = $parent.find('.in');
+                        closed = $parent.find('.collapse:not(.in)');
+
+                        if (expanded && expanded.length) {
+                            collapseData = expanded.data('collapse');
+                            if (collapseData && collapseData.transitioning) return;
+                            expanded.collapse('hide');
+                            closed.collapse('show');
+                            $this.find('span').toggleClass(picker.options.icons.time + ' ' + picker.options.icons.date);
+                            picker.element.find('.input-group-addon span').toggleClass(picker.options.icons.time + ' ' + picker.options.icons.date);
+                        }
+                    });
+                }
+
             }
             if (picker.isInput) {
                 picker.element.on({
@@ -812,13 +849,18 @@ THE SOFTWARE.
             $(window).on(
                 'resize.datetimepicker' + picker.id, $.proxy(place, this));
             if (!picker.isInput) {
-                $(document).on(
-                    'mousedown.datetimepicker' + picker.id, $.proxy(picker.hide, this));
+                if(Modernizr.touch) {
+                    $(document).on('touchend.datetimepicker' + picker.id, $.proxy(picker.hide, this));
+                } else {
+                    $(document).on('mousedown.datetimepicker' + picker.id, $.proxy(picker.hide, this));
+                }
+
             }
         },
 
         detachDatePickerEvents = function () {
             picker.widget.off('click', '.datepicker *', picker.click);
+
             picker.widget.off('click', '[data-action]');
             picker.widget.off('mousedown', picker.stopEvent);
             if (picker.options.pickDate && picker.options.pickTime) {
@@ -1221,7 +1263,7 @@ THE SOFTWARE.
             picker.widget.removeClass("picker-open");
             picker.viewMode = picker.startViewMode;
             showMode();
-            
+
             if (dontBlurPicker !== true) {
                 // blur picker.element
                 picker.element.trigger({
@@ -1229,15 +1271,16 @@ THE SOFTWARE.
                     dontHidePicker: true // prevent recursion
                 });
             }
-            
+
             picker.element.trigger({
                 type: 'dp.hide',
                 date: pMoment(picker.date)
             });
             detachDatePickerGlobalEvents();
         },
-        
+
         picker.blur = function (event) {
+
             if (event.dontHidePicker === true) {
                 // prevent recursion
                 return;
@@ -1324,7 +1367,7 @@ THE SOFTWARE.
             if (!data) $this.data('DateTimePicker', new DateTimePicker(this, options));
         });
     };
-    
+
     $.fn.datetimepicker.defaults = {
         pickDate: true,
         pickTime: true,
