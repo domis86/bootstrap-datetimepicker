@@ -775,8 +775,8 @@ THE SOFTWARE.
 
             var $this, $parent, expanded, closed, collapseData;
             if(Modernizr.touch) {
-                picker.widget.on('touchend','.datepicker *', $.proxy(click, this));
-                picker.widget.on('touchend', '[data-action]', $.proxy(doAction, this)); // this handles time picker clicks
+                picker.widget.on('touchend MSPointerUp','.datepicker *', $.proxy(click, this));
+                picker.widget.on('touchend MSPointerUp', '[data-action]', $.proxy(doAction, this)); // this handles time picker clicks
             } else {
                 picker.widget.on('click', '.datepicker *', $.proxy(click, this)); // this handles date picker clicks
                 picker.widget.on('click', '[data-action]', $.proxy(doAction, this)); // this handles time picker clicks
@@ -790,7 +790,7 @@ THE SOFTWARE.
 
             if (picker.options.pickDate && picker.options.pickTime) {
                 if(Modernizr.touch) {
-                    picker.widget.on('touchEnd.togglePicker', '.accordion-toggle', function (e) {
+                    picker.widget.on('touchEnd.togglePicker MSPointerUp.togglePicker', '.accordion-toggle', function (e) {
                         e.stopPropagation();
                         $this = $(this);
                         $parent = $this.closest('ul');
@@ -851,6 +851,7 @@ THE SOFTWARE.
             if (!picker.isInput) {
                 if(Modernizr.touch) {
                     $(document).on('touchend.datetimepicker' + picker.id, $.proxy(picker.hide, this));
+                    $(document).on('MSPointerUp.datetimepicker' + picker.id, $.proxy(picker.hide, this));
                 } else {
                     $(document).on('mousedown.datetimepicker' + picker.id, $.proxy(picker.hide, this));
                 }
@@ -946,7 +947,7 @@ THE SOFTWARE.
             pMoment.lang(picker.options.language);
             var maxDate = picker.options.maxDate;
             var minDate = picker.options.minDate;
-            
+
             if(timeUnit) {
                 maxDate = pMoment(maxDate).endOf(timeUnit);
                 minDate = pMoment(minDate).startOf(timeUnit);
@@ -1210,7 +1211,7 @@ THE SOFTWARE.
                     } else {
                         picker.setValue(pMoment().format(picker.format))
                     }
-                    notifyChange('', e.type);                    
+                    notifyChange('', e.type);
                 };
             }
             if (picker.widget.hasClass("picker-open")) {
