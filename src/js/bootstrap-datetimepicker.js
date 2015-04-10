@@ -378,7 +378,7 @@ THE SOFTWARE.
             picker.widget.find('.datepicker-days th:eq(1)').text(
                 months[month] + ' ' + year);
 
-            prevMonth = pMoment(picker.viewDate).subtract("months", 1);
+            prevMonth = pMoment(picker.viewDate).subtract(1, "months");
             days = prevMonth.daysInMonth();
             prevMonth.date(days).startOf('week');
             if ((year == startYear && month <= startMonth) || year < startYear) {
@@ -910,7 +910,7 @@ THE SOFTWARE.
         },
 
         set = function () {
-            pMoment.lang(picker.options.language);
+            pMoment.locale(picker.options.language);
             var formatted = '', input;
             if (!picker.unset) formatted = pMoment(picker.date).format(picker.format);
             getPickerInput().val(formatted);
@@ -919,7 +919,7 @@ THE SOFTWARE.
         },
 
 		checkDate = function (direction, unit, amount) {
-		    pMoment.lang(picker.options.language);
+		    pMoment.locale(picker.options.language);
 		    var newDate;
 		    if (direction == "add") {
 		        newDate = pMoment(picker.date);
@@ -944,7 +944,7 @@ THE SOFTWARE.
 		},
 
         isInDisableDates = function (date, timeUnit) {
-            pMoment.lang(picker.options.language);
+            pMoment.locale(picker.options.language);
             var maxDate = picker.options.maxDate;
             var minDate = picker.options.minDate;
 
@@ -960,7 +960,7 @@ THE SOFTWARE.
             return picker.options.disabledDates[pMoment(date).format("YYYY-MM-DD")] === true;
         },
         isInEnableDates = function (date) {
-            pMoment.lang(picker.options.language);
+            pMoment.locale(picker.options.language);
             if (picker.options.enabledDates === false) {
                 return true;
             }
@@ -1290,7 +1290,7 @@ THE SOFTWARE.
         },
 
         picker.setValue = function (newDate) {
-            pMoment.lang(picker.options.language);
+            pMoment.locale(picker.options.language);
             if (!newDate) {
                 picker.unset = true;
                 set();
