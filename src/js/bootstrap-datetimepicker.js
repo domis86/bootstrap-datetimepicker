@@ -1124,7 +1124,7 @@ THE SOFTWARE.
 		    headTemplate:
                     '<thead>' +
 						'<tr>' +
-							'<th class="prev">&lsaquo;</th><th colspan="5" class="switch"></th><th class="next">&rsaquo;</th>' +
+							'<th class="prev"><i class="svg-icon svg-icon-triangle-left"></i></th><th colspan="5" class="switch"></th><th class="next"><i class="svg-icon svg-icon-triangle-right"></i></th>' +
 						'</tr>' +
                     '</thead>',
 		    contTemplate:
