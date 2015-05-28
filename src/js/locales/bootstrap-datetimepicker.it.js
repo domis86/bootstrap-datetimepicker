@@ -17,7 +17,7 @@
         monthsShort : "Gen_Feb_Mar_Apr_Mag_Giu_Lug_Ago_Set_Ott_Nov_Dic".split("_"),
         weekdays : "Domenica_Lunedì_Martedì_Mercoledì_Giovedì_Venerdì_Sabato".split("_"),
         weekdaysShort : "Dom_Lun_Mar_Mer_Gio_Ven_Sab".split("_"),
-        weekdaysMin : "D_L_Ma_Me_G_V_S".split("_"),
+        weekdaysMin : "Dom_Lun_Mar_Mer_Gio_Ven_Sab".split("_"),
         longDateFormat : {
             LT : "HH:mm",
             L : "DD/MM/YYYY",
