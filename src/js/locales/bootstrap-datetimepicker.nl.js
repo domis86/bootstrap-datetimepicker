@@ -15,7 +15,7 @@
         monthsShortWithoutDots = "jan_feb_mrt_apr_mei_jun_jul_aug_sep_okt_nov_dec".split("_");
 
     return moment.lang('nl', {
-        months : "januari_februari_maart_april_mei_juni_juli_augustus_september_oktober_november_december".split("_"),
+        months : "Januari_Februari_Maart_April_Mei_Juni_Juli_Augustus_September_Oktober_November_December".split("_"),
         monthsShort : function (m, format) {
             if (/-MMM-/.test(format)) {
                 return monthsShortWithoutDots[m.month()];
