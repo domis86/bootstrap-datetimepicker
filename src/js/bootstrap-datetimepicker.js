@@ -239,6 +239,7 @@ THE SOFTWARE.
             if (eData.dateDirection !== undefined) picker.options.direction = eData.dateDirection;
             if (eData.dateSidebyside !== undefined) picker.options.sideBySide = eData.dateSidebyside;
             if (eData.initialViewDate !== undefined) picker.options.initialViewDate = eData.initialViewDate; // mod by domis86 - add initialViewDate
+            if (eData.additionalOnClickHandler !== undefined) picker.options.additionalOnClickHandler = eData.additionalOnClickHandler; // mod by domis86 - add additionalOnClickHandler
         },
 
         place = function () {
@@ -568,6 +569,10 @@ THE SOFTWARE.
         },
 
         click = function (e) {
+            if (picker.options.additionalOnClickHandler !== false) {
+                picker.options.additionalOnClickHandler(e);
+            }
+
             e.stopPropagation();
             e.preventDefault();
             picker.unset = false;
@@ -791,6 +796,10 @@ THE SOFTWARE.
             if (picker.options.pickDate && picker.options.pickTime) {
                 if(Modernizr.touch) {
                     picker.widget.on('touchEnd.togglePicker MSPointerUp.togglePicker', '.accordion-toggle', function (e) {
+                        if (picker.options.additionalOnClickHandler !== false) {
+                            picker.options.additionalOnClickHandler(e);
+                        }
+
                         e.stopPropagation();
                         $this = $(this);
                         $parent = $this.closest('ul');
@@ -809,6 +818,10 @@ THE SOFTWARE.
                     });
                 } else {
                     picker.widget.on('click.togglePicker', '.accordion-toggle', function (e) {
+                        if (picker.options.additionalOnClickHandler !== false) {
+                            picker.options.additionalOnClickHandler(e);
+                        }
+
                         e.stopPropagation();
                         $this = $(this);
                         $parent = $this.closest('ul');
@@ -1068,9 +1081,13 @@ THE SOFTWARE.
         },
 
         getTemplate = function () {
+            var trackingAttribute = '';
+            // use this if want to track clicks inside datetimepicker:
+            //var trackingAttribute = ' data-musement-tracking="event|calendar-date|open"';
+
             if (picker.options.pickDate && picker.options.pickTime) {
                 var ret = '';
-                ret = '<div class="bootstrap-datetimepicker-widget' + (picker.options.sideBySide ? ' timepicker-sbs' : '') + ' dropdown-menu" style="z-index:9999 !important;">';
+                ret = '<div class="bootstrap-datetimepicker-widget' + (picker.options.sideBySide ? ' timepicker-sbs' : '') + ' dropdown-menu" style="z-index:9999 !important;" ' + trackingAttribute + '>';
                 if (picker.options.sideBySide) {
                     ret += '<div class="row">' +
                        '<div class="col-sm-6 datepicker">' + dpGlobal.template + '</div>' +
@@ -1091,13 +1108,13 @@ THE SOFTWARE.
                 return ret;
             } else if (picker.options.pickTime) {
                 return (
-                    '<div class="bootstrap-datetimepicker-widget dropdown-menu">' +
+                    '<div class="bootstrap-datetimepicker-widget dropdown-menu" ' + trackingAttribute + '>' +
                         '<div class="timepicker">' + tpGlobal.getTemplate() + '</div>' +
                     '</div>'
                 );
             } else {
                 return (
-                    '<div class="bootstrap-datetimepicker-widget dropdown-menu">' +
+                    '<div class="bootstrap-datetimepicker-widget dropdown-menu" ' + trackingAttribute + '>' +
                         '<div class="datepicker">' + dpGlobal.template + '</div>' +
                     '</div>'
                 );
@@ -1219,6 +1236,10 @@ THE SOFTWARE.
             	picker.widget.removeClass("picker-open");
             }
             else {
+                if (picker.options.additionalOnClickHandler !== false) {
+                    picker.options.additionalOnClickHandler(e);
+                }
+
             	picker.widget.show();
             	picker.widget.addClass("picker-open");
             }
@@ -1393,6 +1414,7 @@ THE SOFTWARE.
         direction: "auto",
         sideBySide: false,
         daysOfWeekDisabled: false,
+        additionalOnClickHandler: false,
 
         initialViewDate: false // mod by domis86 - add initialViewDate
     };
