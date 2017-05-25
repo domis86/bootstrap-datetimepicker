@@ -1226,7 +1226,8 @@ THE SOFTWARE.
                             .seconds(0);
                         picker.setValue(mDate.format(picker.format))
                     } else {
-                        picker.setValue(pMoment().format(picker.format))
+                        var aNewMoment = picker.options.initialViewDate ? pMoment(picker.options.initialViewDate) : pMoment();
+                        picker.setValue(aNewMoment.format(picker.format))
                     }
                     notifyChange('', e.type);
                 };
